@@ -1,7 +1,9 @@
 package practice;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import model.Candidate;
 
 public class CandidateValidator implements Predicate<Candidate> {
@@ -21,12 +23,14 @@ public class CandidateValidator implements Predicate<Candidate> {
         }
         String periodsInUkr = candidate.getPeriodsInUkr();
         if (periodsInUkr != null && !periodsInUkr.isEmpty()) {
-            int totalYears = 0;
-            String[] partsOfPeriod = periodsInUkr.trim().split("-");
-            int[] years = Arrays.stream(partsOfPeriod)
-                    .mapToInt(Integer::parseInt)
-                    .toArray();
-            totalYears = years[1] - years[0];
+            List<String> partsOfPeriod = Arrays.stream(periodsInUkr.trim().split("-"))
+                    .collect(Collectors.toList());
+            if (partsOfPeriod.size() != 2) {
+                return false;
+            }
+            int startOfPeriod = Integer.parseInt(partsOfPeriod.get(0));
+            int endOfPeriod = Integer.parseInt(partsOfPeriod.get(1));
+            int totalYears = endOfPeriod - startOfPeriod;
             return totalYears >= MIN_PERIOD_IN_UKRAINE;
         }
         return false;
